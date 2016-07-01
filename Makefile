@@ -81,7 +81,8 @@ IMPLS = ada awk bash c d clojure coffee cpp crystal cs erlang elisp \
 	elixir es6 factor forth fsharp go groovy guile haskell haxe \
 	io java julia js kotlin logo lua make mal ocaml matlab miniMAL \
 	nim objc objpascal perl perl6 php plpgsql plsql ps python r \
-	racket rpython ruby rust scala swift swift3 tcl vb vhdl vimscript
+	racket rpython ruby rust scala swift swift3 tcl vb vhdl vimscript \
+	python3
 
 step0 = step0_repl
 step1 = step1_read_print
@@ -196,6 +197,7 @@ vb_STEP_TO_PROG =      vb/$($(1)).exe
 vhdl_STEP_TO_PROG =    vhdl/$($(1))
 vimscript_STEP_TO_PROG = vimscript/$($(1)).vim
 guile_STEP_TO_PROG =   guile/$($(1)).scm
+python3_STEP_TO_PROG = python3/$($(1)).py
 
 
 # Needed some argument munging
