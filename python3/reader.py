@@ -23,13 +23,9 @@ class Reader:
         """Returns the token at the current position and increments the
         position.
         """
-        try:
-            token = self.tokens[self.position]
-            self.position += 1
-        except IndexError:
-            raise IndexError('No more tokens')
-        else:
-            return token
+        value = self.peek()
+        self.position += 1
+        return value
 
     def peek(self) -> Token:
         """Returns the token at the current position.
@@ -77,13 +73,16 @@ def read_form(reader):
     """
     token = reader.peek()
     # TODO: handle more types to pass the test
+
     if token == '':
         pass
-    elif token[0] == '(':
+    elif token == '(':
         reader.next()
         return read_list(reader)
     else:
-        return read_atom(reader)
+        value = read_atom(reader)
+        reader.next()
+        return value
 
 
 def read_list(reader: Reader) -> MalList:
@@ -92,9 +91,10 @@ def read_list(reader: Reader) -> MalList:
     while True:
         token = reader.peek()
         if token == '':  # EOF
-            raise ValueError('illegal string')
-            # break
+            # raise ValueError('illegal string')
+            break
         elif token[0] == ')':
+            reader.next()
             break
         else:
             results.append(read_form(reader))
@@ -105,7 +105,7 @@ def read_atom(reader: Reader) -> MalType:
     """Look at the contents of the token and return the appropriate scalar
     (simple/single) data type value.
     """
-    token = reader.next()
+    token = reader.peek()
     # Number type
     try:
         return MalNumber(token)
