@@ -13,6 +13,8 @@ def pr_str(obj: MalType, print_readably=False) -> str:
         s = str(obj)
     elif isinstance(obj, MalList):
         s = '(' + ' '.join(map(pr_str, obj)) + ')'
+    elif isinstance(obj, MalVector):
+        s = '[' + ' '.join(map(pr_str, obj)) + ']'
     elif isinstance(obj, MalSymbol):
         s = obj
     else:

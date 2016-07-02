@@ -20,3 +20,7 @@ class MalString(MalType, str):
 
 class MalSymbol(MalType, str):
     pass
+
+
+class MalVector(MalType, list):
+    pass

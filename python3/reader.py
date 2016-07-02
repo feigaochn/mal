@@ -79,6 +79,9 @@ def read_form(reader):
     elif token == '(':
         reader.next()
         return read_list(reader)
+    elif token == '[':
+        reader.next()
+        return read_vector(reader)
     else:
         value = read_atom(reader)
         reader.next()
@@ -91,9 +94,23 @@ def read_list(reader: Reader) -> MalList:
     while True:
         token = reader.peek()
         if token == '':  # EOF
-            # raise ValueError('illegal string')
-            break
+            raise ValueError('illegal string')
         elif token[0] == ')':
+            reader.next()
+            break
+        else:
+            results.append(read_form(reader))
+    return results
+
+
+def read_vector(reader: Reader) -> MalVector:
+    """Returns a list of values."""
+    results = MalVector()
+    while True:
+        token = reader.peek()
+        if token == '':  # EOF
+            raise ValueError('illegal string')
+        elif token[0] == ']':
             reader.next()
             break
         else:

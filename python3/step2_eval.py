@@ -26,13 +26,16 @@ def eval_ast(ast: MalType, env: dict):
 
 
 def EVAL(ast: MalType, env: dict = None) -> MalType:
+    if isinstance(ast, MalList):
+        if len(ast) == 0:  # an empty list
+            return ast
+        else:  # a list
+            f, *args = eval_ast(ast, env)
+            return f(*args)
+    if isinstance(ast, MalVector):
+        return MalVector(EVAL(member, env) for member in ast)
     if not isinstance(ast, MalList):  # not a list
         return eval_ast(ast, env)
-    elif len(ast) == 0:  # an empty list
-        return ast
-    else:  # a list
-        f, *args = eval_ast(ast, env)
-        return f(*args)
 
 
 def PRINT(exp: MalType) -> str:
