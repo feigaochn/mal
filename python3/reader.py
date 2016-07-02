@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import re
+from functools import partial
 from typing import List
 
 from mal_types import *
@@ -76,53 +77,68 @@ def read_form(reader):
 
     if token == '':
         pass
-    elif token == '(':
+    elif token == "'":  # quote
         reader.next()
+        return MalList([MalSymbol('quote'), read_form(reader)])
+    elif token == "`":  # quasi-quote
+        reader.next()
+        return MalList([MalSymbol('quasiquote'), read_form(reader)])
+    elif token == "~":  # unquote
+        reader.next()
+        return MalList([MalSymbol('unquote'), read_form(reader)])
+    elif token == "~@":  # splice-unquote
+        reader.next()
+        return MalList([MalSymbol('splice-unquote'), read_form(reader)])
+    elif token == '@':  # deref
+        reader.next()
+        return MalList([MalSymbol('deref'), read_form(reader)])
+    elif token == '^':  # with-meta
+        reader.next()
+        val1 = read_form(reader)
+        val2 = read_form(reader)
+        return MalList([MalSymbol('with-meta'), val2, val1])
+
+    elif token == '(':
         return read_list(reader)
     elif token == '[':
-        reader.next()
         return read_vector(reader)
+    elif token == '{':
+        return read_hashmap(reader)
+
     else:
-        value = read_atom(reader)
-        reader.next()
-        return value
+        return read_atom(reader)
 
 
-def read_list(reader: Reader) -> MalList:
-    """Returns a list of values."""
-    results = MalList()
+def read_array(reader: Reader, result_type: MalArray,
+               ending: str) -> MalArray:
+    """Read array-like data: list, vector, hashmap, etc."""
+    results = result_type()
+    reader.next()
     while True:
         token = reader.peek()
         if token == '':  # EOF
             raise ValueError('illegal string')
-        elif token[0] == ')':
+        elif token[0] == ending:
             reader.next()
-            break
+            return results
         else:
             results.append(read_form(reader))
-    return results
 
 
-def read_vector(reader: Reader) -> MalVector:
-    """Returns a list of values."""
-    results = MalVector()
-    while True:
-        token = reader.peek()
-        if token == '':  # EOF
-            raise ValueError('illegal string')
-        elif token[0] == ']':
-            reader.next()
-            break
-        else:
-            results.append(read_form(reader))
-    return results
+read_list = partial(read_array, result_type=MalList, ending=')')
+read_list.__doc__ = """Returns a list of values."""
+
+read_vector = partial(read_array, result_type=MalVector, ending=']')
+read_vector.__doc__ = """Returns a vector of values."""
+
+read_hashmap = partial(read_array, result_type=MalHashmap, ending='}')
 
 
 def read_atom(reader: Reader) -> MalType:
     """Look at the contents of the token and return the appropriate scalar
     (simple/single) data type value.
     """
-    token = reader.peek()
+    token = reader.next()
     # Number type
     try:
         return MalNumber(token)
@@ -131,9 +147,9 @@ def read_atom(reader: Reader) -> MalType:
 
     if token[0] == token[-1] == '"':
         s = MalString(token)
-        s = s.replace('\\"', r'"')
-        s = s.replace('\\n', '\n')
-        s = s.replace('\\\\', '\\')
+        # s = s.replace('\\"', r'"')
+        # s = s.replace('\\n', '\n')
+        # s = s.replace('\\\\', '\\')
         return s
 
     # catch all as Symbol type

@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import typing
+
+
 
 class MalType:
     pass
@@ -24,3 +27,10 @@ class MalSymbol(MalType, str):
 
 class MalVector(MalType, list):
     pass
+
+
+class MalHashmap(MalType, list):
+    pass
+
+
+MalArray = typing.TypeVar('MalArray', MalList, MalVector, MalHashmap)
