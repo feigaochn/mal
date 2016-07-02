@@ -34,6 +34,8 @@ def EVAL(ast: MalType, env: dict = None) -> MalType:
             return f(*args)
     if isinstance(ast, MalVector):
         return MalVector(EVAL(member, env) for member in ast)
+    if isinstance(ast, MalHashmap):
+        return MalHashmap([ast[0], EVAL(ast[1], env)])
     if not isinstance(ast, MalList):  # not a list
         return eval_ast(ast, env)
 
