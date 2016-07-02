@@ -8,21 +8,15 @@ from mal_types import *
 
 
 def READ(s: str) -> MalType:
-    try:
-        obj = reader.read_str(s)
-    except ValueError as e:
-        print('error', e)
-        return None
-    else:
-        return obj
+    return reader.read_str(s)
 
 
-def EVAL(obj: MalType) -> MalType:
-    return obj
+def EVAL(ast: MalType) -> MalType:
+    return ast
 
 
-def PRINT(obj: MalType) -> str:
-    return printer.pr_str(obj, print_readably=False)
+def PRINT(exp: MalType) -> str:
+    return printer.pr_str(exp, print_readably=True)
 
 
 def rep(s: str) -> str:
@@ -30,12 +24,13 @@ def rep(s: str) -> str:
 
 
 def main():
-    try:
-        while True:
-            s = mal_readline.readline('user> ')
-            print(rep(s))
-    except (KeyboardInterrupt, EOFError):
-        pass
+    while True:
+        try:
+            print(rep(mal_readline.readline('user> ')))
+        except (KeyboardInterrupt, EOFError):
+            break
+        except Exception as e:
+            print('Error: ', e)
 
 
 if __name__ == '__main__':

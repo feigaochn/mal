@@ -42,7 +42,8 @@ class Reader:
             return token
 
 
-def read_str(line_str):
+def read_str(line_str: str) -> MalType:
+    """Convert string to an MAL data structure."""
     tokens = tokenizer(line_str)
     reader = Reader(tokens)
     return read_form(reader)
@@ -112,7 +113,11 @@ def read_atom(reader: Reader) -> MalType:
         pass
 
     if token[0] == token[-1] == '"':
-        return MalString(token)
+        s = MalString(token)
+        s = s.replace('\\"', r'"')
+        s = s.replace('\\n', '\n')
+        s = s.replace('\\\\', '\\')
+        return s
 
     # catch all as Symbol type
     try:
