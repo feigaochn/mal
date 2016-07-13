@@ -146,14 +146,20 @@ def read_atom(reader: Reader) -> MalType:
         pass
 
     if token[0] == token[-1] == '"':
-        s = MalString(token)
-        # s = s.replace('\\"', r'"')
-        # s = s.replace('\\n', '\n')
-        # s = s.replace('\\\\', '\\')
-        return s
+        s = token[1:-1]
+        s = s.replace('\\"', '"')
+        s = s.replace('\\n', '\n')
+        s = s.replace('\\\\', '\\')
+        return MalString(s)
+
+    elif token == 'nil':
+        return nil
+    elif token == 'true':
+        return MalBool(True)
+    elif token == 'false':
+        return MalBool(False)
+    elif token[0] == ':':
+        return MalKeyword(token)
 
     # catch all as Symbol type
-    try:
-        return MalSymbol(token)
-    except ValueError:
-        pass
+    return MalSymbol(token)

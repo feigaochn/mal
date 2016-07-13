@@ -1,51 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
-import operator as op
-
-
-class Env2:
-    def __init__(self, outer=None):
-        """
-        :type outer: [Env, None]
-        """
-        self.data = dict()
-        self.outer = outer
-        self._set_default()
-
-    def find(self, k):
-        if k in self.data:
-            return self
-        elif self.outer is not None:
-            return self.outer.get(k)
-        else:
-            return None
-
-    def get(self, k):
-        env = self.find(k)
-        if env:
-            return env.data[k]
-        else:
-            raise KeyError("'{}' not found".format(k))
-
-    def set(self, key, val):
-        self.data[key] = val
-
-    def _set_default(self):
-        self.data.update(
-            {
-                '+': op.add,
-                '-': op.sub,
-                '*': op.mul,
-                '/': op.floordiv,
-            }
-        )
+from mal_types import MalList
 
 
 class Env(dict):
     def __init__(self, *args, **kwargs):
         self._outer = kwargs.pop('outer', None)
+        binds = kwargs.pop('binds', [])
+        exprs = kwargs.pop('exprs', [])
+        # if binds and exprs:
+        for i, b in enumerate(binds):
+            if b == '&':
+                self.set(binds[i+1], MalList(exprs[i:]))
+                break
+            else:
+                self.set(b, exprs[i])
         super().__init__(*args, **kwargs)
 
     def find(self, key):
