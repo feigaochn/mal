@@ -55,8 +55,8 @@ def EVAL(ast: MalType, env: Env) -> MalType:
                 else:
                     return nil
             elif ast[0] == 'fn*':
-                return MalFunction(env=env, binds=ast[1], func_body=ast[2],
-                                   eval_func=EVAL)
+                return MalFunction(ast=ast[2], params=ast[1], env=env,
+                                   eval_fn=EVAL)
             else:
                 f, *args = eval_ast(ast, env)
                 return f(*args)

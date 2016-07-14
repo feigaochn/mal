@@ -47,17 +47,17 @@ class MalHashmap(MalType, list):
 
 
 class MalFunction(MalType):
-    def __init__(self, env, binds, eval_func, func_body):
-        from env import Env
-
-        def closure(*args):
-            closure_env = Env(binds=binds, exprs=args, outer=env)
-            return eval_func(func_body, closure_env)
-
-        self._function = closure
+    def __init__(self, ast, params, env, eval_fn):
+        self.ast = ast
+        self.env = env
+        self.params = params
+        self.fn = eval_fn
 
     def __call__(self, *args):
-        return self._function(*args)
+        from env import Env
+
+        closure_env = Env(binds=self.params, exprs=args, outer=self.env)
+        return self.fn(self.ast, closure_env)
 
     def __str__(self):
         return '#<Function>'
